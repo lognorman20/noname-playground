@@ -1,0 +1,30 @@
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.editor {
+    width: 70%;
+    padding: 10px;
+    border-right: 1px solid #ddd;
+}
+
+.results {
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+}
+
+.output,
+.assembly {
+    flex: 1;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.output pre,
+.assembly pre {
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 5px;
+}
