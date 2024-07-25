@@ -4,7 +4,7 @@ body {
     margin: 0;
     padding: 0;
     overflow: auto;
-    background-color: #1e1e1e; /* Set background color for entire page */
+    background-color: #21252d; /* Set background color for entire page */
     color: #d4d4d4; /* Ensure text color is consistent */
 }
 
@@ -12,14 +12,14 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background-color: #1e1e1e;
+    background-color: #21252d;
     padding: 30px;
 }
 
 .app-header {
     padding: 10px;
     text-align: center;
-    background-color: #1e1e1e;
+    background-color: #21252d;
     color: #d4d4d4;
 }
 
@@ -36,7 +36,7 @@ body {
 .private-input-container,
 .public-input-container {
     padding: 5px;
-    background-color: #1e1e1e; /* Match the dark theme */
+    background-color: #21252d; /* Match the dark theme */
     border-radius: 4px;
     box-shadow: none;
     box-sizing: border-box;
@@ -46,7 +46,7 @@ body {
     padding: 5px;
     width: 100%;
     max-width: 100%;
-    background-color: #1e1e1e;
+    background-color: #21252d;
     color: #ffffff;
     font-family: monospace;
     overflow: auto;
