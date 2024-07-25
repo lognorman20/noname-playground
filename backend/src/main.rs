@@ -1,5 +1,5 @@
 use axum::{
-    http::StatusCode,
+    http::{StatusCode, Method},
     routing::{get, post},
     Json, Router,
 };
@@ -7,13 +7,19 @@ use serde::Deserialize;
 use std::fs::File as StdFile;
 use std::io::Write;
 use std::process::Command;
+use tower_http::cors::{Any, CorsLayer};
 
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
 
+    let cors = CorsLayer::new()
+        .allow_methods([Method::GET, Method::POST])
+        .allow_origin(Any);
+
     let app = Router::new()
         .route("/", get(root))
+        .layer(cors)
         .route("/check_files", get(check_files))
         .route("/check_bin", get(check_bin))
         .route("/run", post(run))

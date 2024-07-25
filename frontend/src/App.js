@@ -13,32 +13,12 @@ import { rust, rustLanguage } from "@codemirror/lang-rust";
 import { json, jsonLanguage } from "@codemirror/lang-json";
 import { languages } from "@codemirror/language-data";
 import "./App.css";
-
-const codePlaceholder = `// Sample code
-fn main(pub public_input: Field, private_input: Field) -> Bool {
-    let xx = private_input + public_input;
-    assert_eq(xx, 2);
-    let yy = xx + 6;
-    return yy == 8;
-}
-`;
-
-const publicInputPlaceholder = `{
-  "private_input": "1"
-}`;
-const privateInputPlaceholder = `{
-  {"public_input": "1"}
-}`;
-
-const basicSetupOptions = {
-  history: true,
-  drawSelection: true,
-  foldGutter: true,
-  allowMultipleSelections: true,
-  bracketMatching: true,
-  crosshairCursor: true,
-  autocompletion: true,
-};
+import {
+  codePlaceholder,
+  publicInputPlaceholder,
+  privateInputPlaceholder,
+  basicSetupOptions,
+} from "./static";
 
 function App() {
   const [codeValue, setCodeValue] = React.useState(codePlaceholder);
@@ -60,6 +40,54 @@ function App() {
   const onPublicInputChange = React.useCallback((val) => {
     setPublicInput(val);
   }, []);
+
+  function handleRun() {
+    // Validate public info JSON
+    try {
+      JSON.parse(publicInput);
+    } catch (e) {
+      setCompilationResult("Invalid public input JSON");
+      return;
+    }
+
+    // Validate private info JSON
+    try {
+      JSON.parse(privateInput);
+    } catch (e) {
+      setCompilationResult("Invalid private input JSON");
+      return;
+    }
+
+    // Build JSON payload
+    const payload = {
+      code: codeValue,
+      publicInput: publicInput,
+      privateInput: privateInput,
+    };
+
+    // Send JSON payload to server
+    fetch("https://noname-playground.onrender.com", {
+      method: "GET",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(JSON.stringify(data, null, 2));
+      })
+      .catch((error) => {
+        console.log("Error fetching data | " + error);
+        console.error("Error:", error);
+      });
+
+    console.log("Successfully ran code");
+  }
+
+  function generateAsm() {
+    console.log("Generate ASM code");
+  }
+
+  function handleSave() {
+    console.log("Save the code");
+  }
 
   return (
     <div className="app-container">
@@ -161,6 +189,7 @@ function App() {
                   <Button
                     sx={{ backgroundColor: "#292c34", color: "#ffffff" }}
                     disableRipple
+                    onClick={handleRun}
                   >
                     Run
                   </Button>
@@ -169,6 +198,7 @@ function App() {
                   <Button
                     sx={{ backgroundColor: "#292c34", color: "#ffffff" }}
                     disableRipple
+                    onClick={generateAsm}
                   >
                     Generate Assembly
                   </Button>
@@ -176,6 +206,7 @@ function App() {
                 <Grid item xs="auto">
                   <Button
                     sx={{ backgroundColor: "#292c34", color: "#ffffff" }}
+                    onClick={handleSave}
                     disableRipple
                   >
                     Save
