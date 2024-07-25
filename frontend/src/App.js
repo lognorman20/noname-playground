@@ -5,21 +5,30 @@ import {
   Button,
   Typography,
   TextareaAutosize,
+  IconButton,
 } from "@mui/material";
+import { GitHub, Article } from "@mui/icons-material";
 import CodeMirror from "@uiw/react-codemirror";
 import { rust, rustLanguage } from "@codemirror/lang-rust";
 import { json, jsonLanguage } from "@codemirror/lang-json";
 import { languages } from "@codemirror/language-data";
 import "./App.css";
 
-const placeholder = `// Sample code
-fn main(pub xx: [Field; 2]) {
-    let cond = xx[0] != xx[1];
-    assert(cond);
-    let cond2 = xx[0] != 7;
-    assert(cond2);
+const codePlaceholder = `// Sample code
+fn main(pub public_input: Field, private_input: Field) -> Bool {
+    let xx = private_input + public_input;
+    assert_eq(xx, 2);
+    let yy = xx + 6;
+    return yy == 8;
 }
 `;
+
+const publicInputPlaceholder = `{
+  "private_input": "1"
+}`;
+const privateInputPlaceholder = `{
+  {"public_input": "1"}
+}`;
 
 const basicSetupOptions = {
   history: true,
@@ -32,11 +41,13 @@ const basicSetupOptions = {
 };
 
 function App() {
-  const [codeValue, setCodeValue] = React.useState(placeholder);
-  const [compilationResult, setCompilationResult] = React.useState("YESSSUHHH");
-  const [assemblyCode, setAssemblyCode] = React.useState("SPOTEMGOTEM");
-  const [publicInput, setPublicInput] = React.useState("");
-  const [privateInput, setPrivateInput] = React.useState("");
+  const [codeValue, setCodeValue] = React.useState(codePlaceholder);
+  const [compilationResult, setCompilationResult] = React.useState("");
+  const [assemblyCode, setAssemblyCode] = React.useState("");
+  const [publicInput, setPublicInput] = React.useState(publicInputPlaceholder);
+  const [privateInput, setPrivateInput] = React.useState(
+    privateInputPlaceholder,
+  );
 
   const onChange = React.useCallback((val) => {
     setCodeValue(val);
@@ -87,7 +98,7 @@ function App() {
                     variant="h5"
                     sx={{ color: "#ffffff" }}
                   >
-                    Public Inputs
+                    Private Inputs
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>
@@ -221,6 +232,22 @@ function App() {
               boxSizing: "border-box",
             }}
           />
+        </Grid>
+        <Grid container justifyContent="center" sx={{ marginTop: 2 }}>
+          <IconButton
+            href="https://github.com/zksecurity/noname"
+            target="_blank"
+            aria-label="GitHub"
+          >
+            <GitHub sx={{ fontSize: 24, color: "#ffffff" }} />
+          </IconButton>
+          <IconButton
+            href="https://zksecurity.github.io/noname"
+            target="_blank"
+            aria-label="Documentation"
+          >
+            <Article sx={{ fontSize: 24, color: "#ffffff" }} />
+          </IconButton>
         </Grid>
       </Grid>
     </div>
