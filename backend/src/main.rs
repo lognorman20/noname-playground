@@ -13,17 +13,13 @@ use tower_http::cors::{Any, CorsLayer};
 async fn main() {
     tracing_subscriber::fmt::init();
 
-    let cors = CorsLayer::new()
-        .allow_methods([Method::GET, Method::POST])
-        .allow_origin(Any);
-
     let app = Router::new()
         .route("/", get(root))
         .route("/check_files", get(check_files))
         .route("/check_bin", get(check_bin))
         .route("/run", post(run))
         .route("/get_asm", post(get_asm))
-        .layer(cors);
+        .layer(CorsLayer::permissive());
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     println!("running app rn big bro");
