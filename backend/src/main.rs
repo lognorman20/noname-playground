@@ -19,15 +19,11 @@ async fn main() {
 
     let app = Router::new()
         .route("/", get(root))
-        .layer(cors.clone())
         .route("/check_files", get(check_files))
-        .layer(cors.clone())
         .route("/check_bin", get(check_bin))
-        .layer(cors.clone())
         .route("/run", post(run))
-        .layer(cors.clone())
         .route("/get_asm", post(get_asm))
-        .layer(cors.clone());
+        .layer(cors);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     println!("running app rn big bro");
