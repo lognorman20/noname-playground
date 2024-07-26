@@ -63,7 +63,7 @@ async fn check_files() -> (StatusCode, Json<serde_json::Value>) {
 }
 
 async fn check_bin() -> (StatusCode, Json<serde_json::Value>) {
-    let output = Command::new("./noname")
+    let output = Command::new("noname")
         .arg("-V")
         .output()
         .expect("Failed to execute command");
@@ -148,7 +148,7 @@ async fn run(Json(payload): Json<ProgramInfo>) -> (StatusCode, Json<serde_json::
 
     // run the code
     println!("RUNNING CODE");
-    let output = Command::new("./noname")
+    let output = Command::new("noname")
         .arg("test")
         .args(&["--path", "tmp/src/main.no"])
         .args(&["--private-inputs", "tmp/private_input.json"])
@@ -181,7 +181,7 @@ async fn run(Json(payload): Json<ProgramInfo>) -> (StatusCode, Json<serde_json::
 
 async fn get_asm(Json(payload): Json<ProgramInfo>) -> (StatusCode, Json<serde_json::Value>) {
     println!("GETTING ASM");
-    let output = Command::new("./noname")
+    let output = Command::new("noname")
         .arg("test")
         .args(&["--path", "tmp/src/main.no"])
         .args(&["--private-inputs", "tmp/private_input.json"])
