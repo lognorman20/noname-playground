@@ -41,6 +41,44 @@ function App() {
     setPublicInput(val);
   }, []);
 
+  function checkFiles() {
+    fetch("https://noname-playground.onrender.com/check_files", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setCompilationResult(
+          data.response ? data.response : "No response key found",
+        );
+        console.log("Check Files response:", data);
+      })
+      .catch((error) => {
+        console.error("Error fetching check_files data:", error);
+      });
+  }
+
+  function checkBin() {
+    fetch("https://noname-playground.onrender.com/check_bin", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setCompilationResult(
+          data.response ? data.response : "No response key found",
+        );
+        console.log("Check Bin response:", data);
+      })
+      .catch((error) => {
+        console.error("Error fetching check_bin data:", error);
+      });
+  }
+
   function handleRun() {
     // Validate public info JSON
     try {
@@ -66,15 +104,21 @@ function App() {
     };
 
     // Send JSON payload to server
-    fetch("https://noname-playground.onrender.com", {
-      method: "GET",
+    fetch("https://noname-playground.onrender.com/run", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(JSON.stringify(data, null, 2));
+        setCompilationResult(
+          data.response ? data.response : "No response key found",
+        );
       })
       .catch((error) => {
-        console.log("Error fetching data | " + error);
+        setCompilationResult("Error fetching data | " + error);
         console.error("Error:", error);
       });
 
@@ -82,11 +126,59 @@ function App() {
   }
 
   function generateAsm() {
-    console.log("Generate ASM code");
+    // Validate public info JSON
+    try {
+      JSON.parse(publicInput);
+    } catch (e) {
+      setCompilationResult("Invalid public input JSON");
+      return;
+    }
+
+    // Validate private info JSON
+    try {
+      JSON.parse(privateInput);
+    } catch (e) {
+      setCompilationResult("Invalid private input JSON");
+      return;
+    }
+
+    // Build JSON payload
+    const payload = {
+      code: codeValue,
+      publicInput: publicInput,
+      privateInput: privateInput,
+    };
+
+    // Send JSON payload to server
+    fetch("https://noname-playground.onrender.com/get_asm", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setAssemblyCode(
+          data.response ? data.response : "No response key found",
+        );
+      })
+      .catch((error) => {
+        setAssemblyCode("Error fetching data | " + error);
+        console.error("Error:", error);
+      });
+
+    console.log("Successfully generated ASM code");
   }
 
   function handleSave() {
-    console.log("Save the code");
+    const blob = new Blob([codeValue], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "main.no";
+    link.click();
   }
 
   return (
