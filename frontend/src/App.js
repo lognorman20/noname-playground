@@ -101,6 +101,7 @@ function App() {
       code: codeValue,
       publicInput: publicInput,
       privateInput: privateInput,
+      backend: "kimchi-vesta",
     };
 
     // Send JSON payload to server
@@ -147,6 +148,7 @@ function App() {
       code: codeValue,
       publicInput: publicInput,
       privateInput: privateInput,
+      backend: "kimchi-vesta",
     };
 
     // Send JSON payload to server
