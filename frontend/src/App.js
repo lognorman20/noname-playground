@@ -19,6 +19,7 @@ import {
   privateInputPlaceholder,
   basicSetupOptions,
 } from "./static";
+import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 
 function App() {
   const [codeValue, setCodeValue] = React.useState(codePlaceholder);
@@ -28,6 +29,7 @@ function App() {
   const [privateInput, setPrivateInput] = React.useState(
     privateInputPlaceholder,
   );
+  const [selectedBackend, setSelectedBackend] = React.useState("kimchi-vesta");
 
   const onChange = React.useCallback((val) => {
     setCodeValue(val);
@@ -40,6 +42,53 @@ function App() {
   const onPublicInputChange = React.useCallback((val) => {
     setPublicInput(val);
   }, []);
+
+  function BackendSelector() {
+    const MenuProps = {
+      PaperProps: {
+        sx: {
+          bgcolor: "#292c34",
+          color: "white",
+          "& .MuiMenuItem-root": {
+            padding: 1,
+          },
+        },
+      },
+    };
+
+    return (
+      <FormControl fullWidth size="small" sx={{ marginBottom: 2 }}>
+        <InputLabel id="backend-selector-label" sx={{ color: "white" }}>
+          Select Backend
+        </InputLabel>
+        <Select
+          labelId="backend-selector-label"
+          id="backend-selector"
+          value={selectedBackend}
+          label="Select Backend"
+          onChange={setSelectedBackend}
+          MenuProps={MenuProps}
+          sx={{
+            backgroundColor: "#292c34",
+            color: "white",
+            ".MuiOutlinedInput-notchedOutline": {
+              border: "none",
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              border: "none",
+            },
+            ".MuiSvgIcon-root": {
+              color: "white",
+            },
+          }}
+        >
+          <MenuItem value="kimchi-vesta">Kimchi-Vesta</MenuItem>
+          <MenuItem value="r1cs-bls12-381">R1CS-BLS12-381</MenuItem>
+          <MenuItem value="r1cs-bn254">R1CS-BN254</MenuItem>
+        </Select>
+      </FormControl>
+    );
+  }
 
   function checkFiles() {
     fetch("https://noname-playground.onrender.com/check_files", {
@@ -96,31 +145,34 @@ function App() {
       return;
     }
 
-    // Build JSON payload
-    const payload = {
+    // Send request
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
       code: codeValue,
-      publicInput: publicInput,
-      privateInput: privateInput,
+      public_input: publicInput,
+      private_input: privateInput,
       backend: "kimchi-vesta",
+    });
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
     };
 
-    // Send JSON payload to server
-    fetch("https://noname-playground.onrender.com/run", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    })
+    fetch("https://noname-playground.onrender.com/run", requestOptions)
       .then((response) => response.json())
-      .then((data) => {
+      .then((result) =>
         setCompilationResult(
-          data.response ? data.response : "No response key found",
-        );
-      })
+          result.response ? result.response : "No response key found",
+        ),
+      )
       .catch((error) => {
         setCompilationResult("Error fetching data | " + error);
-        console.error("Error:", error);
+        console.error(error);
       });
 
     console.log("Successfully ran code");
@@ -143,31 +195,34 @@ function App() {
       return;
     }
 
-    // Build JSON payload
-    const payload = {
+    // Send request
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
       code: codeValue,
-      publicInput: publicInput,
-      privateInput: privateInput,
+      public_input: publicInput,
+      private_input: privateInput,
       backend: "kimchi-vesta",
+    });
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
     };
 
-    // Send JSON payload to server
-    fetch("https://noname-playground.onrender.com/get_asm", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    })
+    fetch("https://noname-playground.onrender.com/get_asm", requestOptions)
       .then((response) => response.json())
-      .then((data) => {
+      .then((result) =>
         setAssemblyCode(
-          data.response ? data.response : "No response key found",
-        );
-      })
+          result.response ? result.response : "No response key found",
+        ),
+      )
       .catch((error) => {
         setAssemblyCode("Error fetching data | " + error);
-        console.error("Error:", error);
+        console.error(error);
       });
 
     console.log("Successfully generated ASM code");
@@ -197,7 +252,7 @@ function App() {
               value={codeValue}
               placeholder={"Please enter your Noname code here..."}
               theme={"dark"}
-              height="60vh"
+              height="64vh"
               width="100%"
               basicSetup={basicSetupOptions}
               autoFocus={true}
@@ -212,7 +267,7 @@ function App() {
         </Grid>
         <Grid item xs={4}>
           <Grid container direction={"column"} spacing={1}>
-            <Grid item xs={4}>
+            <Grid item xs={2}>
               <Grid container direction={"column"} spacing={0}>
                 <Grid item xs={6}>
                   <Typography
@@ -228,7 +283,7 @@ function App() {
                     value={privateInput}
                     placeholder={"Private input here"}
                     theme={"dark"}
-                    height="22vh"
+                    height="20vh"
                     width="100%"
                     basicSetup={basicSetupOptions}
                     autoFocus={true}
@@ -242,7 +297,7 @@ function App() {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={2}>
               <Grid container direction={"column"} spacing={0}>
                 <Grid item xs={6}>
                   <Typography
@@ -258,7 +313,7 @@ function App() {
                     value={publicInput}
                     placeholder={"Public input here"}
                     theme={"dark"}
-                    height="22vh"
+                    height="20vh"
                     width="100%"
                     basicSetup={basicSetupOptions}
                     autoFocus={true}
@@ -271,6 +326,9 @@ function App() {
                   />
                 </Grid>
               </Grid>
+            </Grid>
+            <Grid item xs={2}>
+              <BackendSelector />
             </Grid>
             <Grid item xs={4}>
               <Grid
@@ -310,7 +368,7 @@ function App() {
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={7}>
           <Typography align="center" sx={{ color: "#ffffff" }} variant="h5">
             Code Output
           </Typography>
@@ -334,7 +392,7 @@ function App() {
             }}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={5}>
           <Typography align="center" sx={{ color: "#ffffff" }} variant="h5">
             Assembly Output
           </Typography>
