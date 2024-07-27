@@ -66,7 +66,7 @@ function App() {
           id="backend-selector"
           value={selectedBackend}
           label="Select Backend"
-          onChange={setSelectedBackend}
+          onChange={(e) => setSelectedBackend(e.target.value)}
           MenuProps={MenuProps}
           sx={{
             backgroundColor: "#292c34",
@@ -153,7 +153,7 @@ function App() {
       code: codeValue,
       public_input: publicInput,
       private_input: privateInput,
-      backend: "kimchi-vesta",
+      backend: selectedBackend, // Use the selected backend
     });
 
     const requestOptions = {
@@ -203,7 +203,7 @@ function App() {
       code: codeValue,
       public_input: publicInput,
       private_input: privateInput,
-      backend: "kimchi-vesta",
+      backend: selectedBackend, // Use the selected backend
     });
 
     const requestOptions = {
