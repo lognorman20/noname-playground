@@ -6,12 +6,15 @@ import {
   Typography,
   TextareaAutosize,
   IconButton,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { GitHub, Article } from "@mui/icons-material";
 import CodeMirror from "@uiw/react-codemirror";
 import { rust, rustLanguage } from "@codemirror/lang-rust";
 import { json, jsonLanguage } from "@codemirror/lang-json";
 import { languages } from "@codemirror/language-data";
+import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import "./App.css";
 import {
   codePlaceholder,
@@ -19,7 +22,6 @@ import {
   privateInputPlaceholder,
   basicSetupOptions,
 } from "./static";
-import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 
 function App() {
   const [codeValue, setCodeValue] = React.useState(codePlaceholder);
@@ -30,6 +32,10 @@ function App() {
     privateInputPlaceholder,
   );
   const [selectedBackend, setSelectedBackend] = React.useState("kimchi-vesta");
+
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = React.useState("info");
 
   const onChange = React.useCallback((val) => {
     setCodeValue(val);
@@ -90,6 +96,16 @@ function App() {
     );
   }
 
+  function showSnackbar(message, severity = "info") {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  }
+
+  function handleCloseSnackbar() {
+    setSnackbarOpen(false);
+  }
+
   function checkFiles() {
     fetch("https://noname-playground.onrender.com/check_files", {
       method: "GET",
@@ -129,11 +145,14 @@ function App() {
   }
 
   function handleRun() {
+    showSnackbar("Running...");
+
     // Validate public info JSON
     try {
       JSON.parse(publicInput);
     } catch (e) {
       setCompilationResult("Invalid public input JSON");
+      showSnackbar("Invalid public input JSON", "error");
       return;
     }
 
@@ -142,6 +161,7 @@ function App() {
       JSON.parse(privateInput);
     } catch (e) {
       setCompilationResult("Invalid private input JSON");
+      showSnackbar("Invalid private input JSON", "error");
       return;
     }
 
@@ -165,13 +185,15 @@ function App() {
 
     fetch("https://noname-playground.onrender.com/run", requestOptions)
       .then((response) => response.json())
-      .then((result) =>
+      .then((result) => {
         setCompilationResult(
           result.response ? result.response : "No response key found",
-        ),
-      )
+        );
+        showSnackbar("Run completed successfully!", "success");
+      })
       .catch((error) => {
         setCompilationResult("Error fetching data | " + error);
+        showSnackbar("Error running code", "error");
         console.error(error);
       });
 
@@ -179,11 +201,14 @@ function App() {
   }
 
   function generateAsm() {
+    showSnackbar("Generating Assembly...");
+
     // Validate public info JSON
     try {
       JSON.parse(publicInput);
     } catch (e) {
       setCompilationResult("Invalid public input JSON");
+      showSnackbar("Invalid public input JSON", "error");
       return;
     }
 
@@ -192,6 +217,7 @@ function App() {
       JSON.parse(privateInput);
     } catch (e) {
       setCompilationResult("Invalid private input JSON");
+      showSnackbar("Invalid private input JSON", "error");
       return;
     }
 
@@ -215,13 +241,15 @@ function App() {
 
     fetch("https://noname-playground.onrender.com/get_asm", requestOptions)
       .then((response) => response.json())
-      .then((result) =>
+      .then((result) => {
         setAssemblyCode(
           result.response ? result.response : "No response key found",
-        ),
-      )
+        );
+        showSnackbar("Assembly code generated successfully!", "success");
+      })
       .catch((error) => {
         setAssemblyCode("Error fetching data | " + error);
+        showSnackbar("Error generating assembly", "error");
         console.error(error);
       });
 
@@ -229,6 +257,8 @@ function App() {
   }
 
   function handleSave() {
+    showSnackbar("Saving...");
+
     const blob = new Blob([codeValue], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
 
@@ -236,10 +266,21 @@ function App() {
     link.href = url;
     link.download = "main.no";
     link.click();
+
+    showSnackbar("Code saved successfully!", "success");
   }
 
   return (
     <div className="app-container">
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
       <header className="app-header">
         <Typography variant="h4" gutterBottom>
           Noname Code Playground
