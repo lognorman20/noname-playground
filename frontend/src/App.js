@@ -21,6 +21,7 @@ import {
   publicInputPlaceholder,
   privateInputPlaceholder,
   basicSetupOptions,
+  EXAMPLES
 } from "./static";
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
     privateInputPlaceholder,
   );
   const [selectedBackend, setSelectedBackend] = React.useState("kimchi-vesta");
+  const [selectedExample, setSelectedExample] = React.useState("");
 
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState("");
@@ -48,6 +50,15 @@ function App() {
   const onPublicInputChange = React.useCallback((val) => {
     setPublicInput(val);
   }, []);
+
+  const handleExampleChange = (event) => {
+      const exampleKey = event.target.value;
+      setSelectedExample(exampleKey);
+      const example = EXAMPLES[exampleKey];
+      setCodeValue(example.code);
+      setPublicInput(example.public_input);
+      setPrivateInput(example.private_input);
+    };
 
   function BackendSelector() {
     const MenuProps = {
@@ -95,6 +106,55 @@ function App() {
       </FormControl>
     );
   }
+
+  function ExampleSelector() {
+      const MenuProps = {
+        PaperProps: {
+          sx: {
+            bgcolor: "#292c34",
+            color: "white",
+            "& .MuiMenuItem-root": {
+              padding: 1,
+            },
+          },
+        },
+      };
+
+      return (
+        <FormControl fullWidth size="small" sx={{ marginBottom: 2 }}>
+          <InputLabel id="example-selector-label" sx={{ color: "white" }}>
+            Select Example
+          </InputLabel>
+          <Select
+            labelId="example-selector-label"
+            id="example-selector"
+            value={selectedExample}
+            label="Select Example"
+            onChange={handleExampleChange}
+            MenuProps={MenuProps}
+            sx={{
+              backgroundColor: "#292c34",
+              color: "white",
+              ".MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+              ".MuiSvgIcon-root": {
+                color: "white",
+              },
+            }}
+          >
+            {Object.keys(EXAMPLES).map((key) => (
+              <MenuItem key={key} value={key}>
+                {key}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      );
+    }
 
   function showSnackbar(message, severity = "info") {
     setSnackbarMessage(message);
@@ -293,7 +353,7 @@ function App() {
               value={codeValue}
               placeholder={"Please enter your Noname code here..."}
               theme={"dark"}
-              height="64vh"
+              height="73vh"
               width="100%"
               basicSetup={basicSetupOptions}
               autoFocus={true}
@@ -368,7 +428,10 @@ function App() {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={1}>
+              <ExampleSelector />
+            </Grid>
+            <Grid item xs={1}>
               <BackendSelector />
             </Grid>
             <Grid item xs={4}>
