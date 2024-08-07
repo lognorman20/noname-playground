@@ -1,5 +1,5 @@
 use axum::{
-    http::{Method, StatusCode},
+    http::StatusCode,
     routing::{get, post},
     Json, Router,
 };
@@ -7,7 +7,7 @@ use serde::Deserialize;
 use std::fs::File as StdFile;
 use std::io::Write;
 use std::process::Command;
-use tower_http::cors::{Any, CorsLayer};
+use tower_http::cors::CorsLayer;
 
 #[tokio::main]
 async fn main() {
@@ -17,6 +17,7 @@ async fn main() {
         .route("/", get(root))
         .route("/check_files", get(check_files))
         .route("/check_bin", get(check_bin))
+        .route("/prove", get(prove))
         .route("/run", post(run))
         .route("/get_asm", post(get_asm))
         .layer(CorsLayer::permissive());
@@ -201,6 +202,41 @@ async fn get_asm(Json(payload): Json<ProgramInfo>) -> (StatusCode, Json<serde_js
         });
         (StatusCode::ACCEPTED, Json(response))
     }
+}
+
+async fn prove() -> (StatusCode, Json<serde_json::Value>) {
+    println!("PROVING...");
+
+    let run_output = Command::new("noname")
+        .arg("run")
+        .args(&["--path", "tmp"])
+        .args(&["--private-inputs", "tmp/private_input.json"])
+        .args(&["--public-inputs", "tmp/public_input.json"])
+        .output()
+        .expect("Failed to execute command");
+
+    println!("GENERATED JSON FILES...");
+    let run_status = run_output.status.success();
+    let run_response = if run_status {
+        let proof_output = Command::new("./snarkjs-prove-and-verify.sh")
+            .arg("tmp")
+            .output()
+            .expect("Failed to execute command");
+
+        let proof_status = proof_output.status.success();
+        let proof_response = String::from_utf8_lossy(if proof_status { &proof_output.stdout } else { &proof_output.stderr }).to_string();
+        (proof_status, proof_response)
+    } else {
+        (false, String::from_utf8_lossy(&run_output.stderr).to_string())
+    };
+
+    let status = if run_status && run_response.0 { StatusCode::OK } else { StatusCode::ACCEPTED };
+    let response = serde_json::json!({
+        "status": if run_status && run_response.0 { "success" } else { "error" },
+        "response": run_response.1
+    });
+
+    (status, Json(response))
 }
 
 #[derive(Deserialize)]

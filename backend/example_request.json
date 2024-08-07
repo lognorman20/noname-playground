@@ -1,5 +1,0 @@
-{
-  "code": "fn main(pub xx: [Field; 2]) {\nlet cond = xx[0] != xx[1];\nassert(cond);\nlet cond2 = xx[0] != 7;\nassert(cond2);\n}\n",
-  "public_input": "{\"xx\": [\"1\", \"2\"]}",
-  "private_input": "{}"
-}
