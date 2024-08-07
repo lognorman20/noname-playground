@@ -280,7 +280,7 @@ function App() {
   }
 
   function handleProve() {
-    showSnackbar("Proving...");
+    showSnackbar("Proving...", "info");
 
     const requestOptions = {
       method: "GET",
@@ -288,13 +288,29 @@ function App() {
     };
 
     fetch("https://noname-playground.onrender.com/prove", requestOptions)
-      .then((response) => response.text())
+      .then((response) => response.json())
       .then((result) => {
-        setProofOutput(result);
+        // Regular expression to match and remove ANSI escape sequences
+        const ansiEscapeRegex = /\x1B\[([0-9;]*[a-zA-Z])/g;
+
+        // Remove ANSI escape sequences from the logs
+        let cleanedLogs = result.response.replace(ansiEscapeRegex, '');
+
+        // Regular expression to find the log entries and reformat them
+        const logEntryRegex = /\[INFO\]  snarkJS: (.*?)(?=\[INFO\]|$)/gs;
+
+        // Extract and join the matched groups
+        const matches = cleanedLogs.matchAll(logEntryRegex);
+        const output = Array.from(matches, match => `[INFO]  snarkJS: ${match[1]}`).join('\n');
+        setProofOutput(
+          result.response ? output : "No response key found",
+        );
+        showSnackbar("Proof generated successfully!", "success");
         console.log(result);
       })
       .catch((error) => {
         setProofOutput("Error fetching proof | " + error);
+        showSnackbar("Error generating proof", "error");
         console.error(error);
       });
     console.log("Successfully generated proof");
@@ -489,7 +505,7 @@ function App() {
           </Typography>
           <TextareaAutosize
             minRows={10}
-            maxRows={20}
+            maxRows={15}
             value={compilationResult}
             readOnly
             placeholder="Compilation result will appear here..."
