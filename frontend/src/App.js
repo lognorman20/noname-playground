@@ -21,7 +21,7 @@ import {
   publicInputPlaceholder,
   privateInputPlaceholder,
   basicSetupOptions,
-  EXAMPLES
+  EXAMPLES,
 } from "./static";
 
 function App() {
@@ -52,13 +52,13 @@ function App() {
   }, []);
 
   const handleExampleChange = (event) => {
-      const exampleKey = event.target.value;
-      setSelectedExample(exampleKey);
-      const example = EXAMPLES[exampleKey];
-      setCodeValue(example.code);
-      setPublicInput(example.public_input);
-      setPrivateInput(example.private_input);
-    };
+    const exampleKey = event.target.value;
+    setSelectedExample(exampleKey);
+    const example = EXAMPLES[exampleKey];
+    setCodeValue(example.code);
+    setPublicInput(example.public_input);
+    setPrivateInput(example.private_input);
+  };
 
   function BackendSelector() {
     const MenuProps = {
@@ -108,53 +108,53 @@ function App() {
   }
 
   function ExampleSelector() {
-      const MenuProps = {
-        PaperProps: {
-          sx: {
-            bgcolor: "#292c34",
-            color: "white",
-            "& .MuiMenuItem-root": {
-              padding: 1,
-            },
+    const MenuProps = {
+      PaperProps: {
+        sx: {
+          bgcolor: "#292c34",
+          color: "white",
+          "& .MuiMenuItem-root": {
+            padding: 1,
           },
         },
-      };
+      },
+    };
 
-      return (
-        <FormControl fullWidth size="small" sx={{ marginBottom: 2 }}>
-          <InputLabel id="example-selector-label" sx={{ color: "white" }}>
-            Select Example
-          </InputLabel>
-          <Select
-            labelId="example-selector-label"
-            id="example-selector"
-            value={selectedExample}
-            label="Select Example"
-            onChange={handleExampleChange}
-            MenuProps={MenuProps}
-            sx={{
-              backgroundColor: "#292c34",
+    return (
+      <FormControl fullWidth size="small" sx={{ marginBottom: 2 }}>
+        <InputLabel id="example-selector-label" sx={{ color: "white" }}>
+          Select Example
+        </InputLabel>
+        <Select
+          labelId="example-selector-label"
+          id="example-selector"
+          value={selectedExample}
+          label="Select Example"
+          onChange={handleExampleChange}
+          MenuProps={MenuProps}
+          sx={{
+            backgroundColor: "#292c34",
+            color: "white",
+            ".MuiOutlinedInput-notchedOutline": {
+              border: "none",
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              border: "none",
+            },
+            ".MuiSvgIcon-root": {
               color: "white",
-              ".MuiOutlinedInput-notchedOutline": {
-                border: "none",
-              },
-              "&:hover .MuiOutlinedInput-notchedOutline": {
-                border: "none",
-              },
-              ".MuiSvgIcon-root": {
-                color: "white",
-              },
-            }}
-          >
-            {Object.keys(EXAMPLES).map((key) => (
-              <MenuItem key={key} value={key}>
-                {key}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      );
-    }
+            },
+          }}
+        >
+          {Object.keys(EXAMPLES).map((key) => (
+            <MenuItem key={key} value={key}>
+              {key}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    );
+  }
 
   function showSnackbar(message, severity = "info") {
     setSnackbarMessage(message);
@@ -164,44 +164,6 @@ function App() {
 
   function handleCloseSnackbar() {
     setSnackbarOpen(false);
-  }
-
-  function checkFiles() {
-    fetch("https://noname-playground.onrender.com/check_files", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setCompilationResult(
-          data.response ? data.response : "No response key found",
-        );
-        console.log("Check Files response:", data);
-      })
-      .catch((error) => {
-        console.error("Error fetching check_files data:", error);
-      });
-  }
-
-  function checkBin() {
-    fetch("https://noname-playground.onrender.com/check_bin", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setCompilationResult(
-          data.response ? data.response : "No response key found",
-        );
-        console.log("Check Bin response:", data);
-      })
-      .catch((error) => {
-        console.error("Error fetching check_bin data:", error);
-      });
   }
 
   function handleRun() {
@@ -347,13 +309,13 @@ function App() {
         </Typography>
       </header>
       <Grid container spacing={2}>
-        <Grid item xs={8}>
+        <Grid item xs={7}>
           <Paper sx={{ bgcolor: "#21252d" }} elevation={0}>
             <CodeMirror
               value={codeValue}
               placeholder={"Please enter your Noname code here..."}
               theme={"dark"}
-              height="73vh"
+              height="75vh"
               width="100%"
               basicSetup={basicSetupOptions}
               autoFocus={true}
@@ -366,7 +328,7 @@ function App() {
             />
           </Paper>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={5}>
           <Grid container direction={"column"} spacing={1}>
             <Grid item xs={2}>
               <Grid container direction={"column"} spacing={0}>
@@ -428,11 +390,15 @@ function App() {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={1}>
-              <ExampleSelector />
-            </Grid>
-            <Grid item xs={1}>
-              <BackendSelector />
+            <Grid item xs="auto">
+              <Grid container direction={"row"} spacing={3} justifyContent="center">
+                <Grid item xs={6}>
+                  <ExampleSelector />
+                </Grid>
+                <Grid item xs={6}>
+                  <BackendSelector />
+                </Grid>
+              </Grid>
             </Grid>
             <Grid item xs={4}>
               <Grid
@@ -465,7 +431,25 @@ function App() {
                     onClick={handleSave}
                     disableRipple
                   >
-                    Save
+                    Prove
+                  </Button>
+                </Grid>
+                <Grid item xs="auto">
+                  <Button
+                    sx={{ backgroundColor: "#292c34", color: "#ffffff" }}
+                    onClick={handleSave}
+                    disableRipple
+                  >
+                    Save Code
+                  </Button>
+                </Grid>
+                <Grid item xs="auto">
+                  <Button
+                    sx={{ backgroundColor: "#292c34", color: "#ffffff" }}
+                    onClick={handleSave}
+                    disableRipple
+                  >
+                    Save Proof
                   </Button>
                 </Grid>
               </Grid>
@@ -478,7 +462,7 @@ function App() {
           </Typography>
           <TextareaAutosize
             minRows={10}
-            maxRows={20}
+            maxRows={25}
             value={compilationResult}
             readOnly
             placeholder="Compilation result will appear here..."
@@ -497,28 +481,56 @@ function App() {
           />
         </Grid>
         <Grid item xs={5}>
-          <Typography align="center" sx={{ color: "#ffffff" }} variant="h5">
-            Assembly Output
-          </Typography>
-          <TextareaAutosize
-            minRows={10}
-            maxRows={20}
-            value={assemblyCode}
-            readOnly
-            placeholder="Assembly code will appear here..."
-            style={{
-              width: "100%",
-              backgroundColor: "#292c34",
-              color: "#d4d4d4",
-              border: "1px solid #444",
-              borderRadius: "4px",
-              padding: "10px",
-              fontFamily: "monospace",
-              fontSize: "14px",
-              resize: "none",
-              boxSizing: "border-box",
-            }}
-          />
+          <Grid container direction={"column"} spacing={0}>
+            <Grid item xs={4}>
+              <Typography align="center" sx={{ color: "#ffffff" }} variant="h5">
+                Assembly Output
+              </Typography>
+              <TextareaAutosize
+                minRows={10}
+                maxRows={20}
+                value={assemblyCode}
+                readOnly
+                placeholder="Assembly code will appear here..."
+                style={{
+                  width: "100%",
+                  backgroundColor: "#292c34",
+                  color: "#d4d4d4",
+                  border: "1px solid #444",
+                  borderRadius: "4px",
+                  padding: "10px",
+                  fontFamily: "monospace",
+                  fontSize: "14px",
+                  resize: "none",
+                  boxSizing: "border-box",
+                }}
+              />
+            </Grid>
+            <Grid item xs={3}>
+              <Typography align="center" sx={{ color: "#ffffff" }} variant="h5">
+                Proof Output
+              </Typography>
+              <TextareaAutosize
+                minRows={10}
+                maxRows={20}
+                value={assemblyCode}
+                readOnly
+                placeholder="Assembly code will appear here..."
+                style={{
+                  width: "100%",
+                  backgroundColor: "#292c34",
+                  color: "#d4d4d4",
+                  border: "1px solid #444",
+                  borderRadius: "4px",
+                  padding: "10px",
+                  fontFamily: "monospace",
+                  fontSize: "14px",
+                  resize: "none",
+                  boxSizing: "border-box",
+                }}
+              />
+            </Grid>
+          </Grid>
         </Grid>
         <Grid container justifyContent="center" sx={{ marginTop: 2 }}>
           <IconButton
