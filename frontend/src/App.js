@@ -316,8 +316,8 @@ function App() {
     console.log("Successfully generated proof");
   }
 
-  function handleSave() {
-    showSnackbar("Saving...");
+  function handleSaveCode() {
+    showSnackbar("Saving code...");
 
     const blob = new Blob([codeValue], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
@@ -328,6 +328,20 @@ function App() {
     link.click();
 
     showSnackbar("Code saved successfully!", "success");
+  }
+
+  function handleSaveProof() {
+    showSnackbar("Saving proof (unimplemented)...");
+
+    const blob = new Blob([codeValue], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "main.no";
+    link.click();
+
+    showSnackbar("Proof saved successfully! (sike lol)", "success");
   }
 
   return (
@@ -480,7 +494,7 @@ function App() {
                 <Grid item xs="auto">
                   <Button
                     sx={{ backgroundColor: "#292c34", color: "#ffffff" }}
-                    onClick={handleSave}
+                    onClick={handleSaveCode}
                     disableRipple
                   >
                     Save Code
@@ -489,7 +503,7 @@ function App() {
                 <Grid item xs="auto">
                   <Button
                     sx={{ backgroundColor: "#292c34", color: "#ffffff" }}
-                    onClick={handleSave}
+                    onClick={handleSaveProof}
                     disableRipple
                   >
                     Save Proof
