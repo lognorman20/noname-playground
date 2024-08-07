@@ -28,6 +28,7 @@ function App() {
   const [codeValue, setCodeValue] = React.useState(codePlaceholder);
   const [compilationResult, setCompilationResult] = React.useState("");
   const [assemblyCode, setAssemblyCode] = React.useState("");
+  const [proofOutput, setProofOutput] = React.useState("");
   const [publicInput, setPublicInput] = React.useState(publicInputPlaceholder);
   const [privateInput, setPrivateInput] = React.useState(
     privateInputPlaceholder,
@@ -278,6 +279,27 @@ function App() {
     console.log("Successfully generated ASM code");
   }
 
+  function handleProve() {
+    showSnackbar("Proving...");
+
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow",
+    };
+
+    fetch("https://noname-playground.onrender.com/prove", requestOptions)
+      .then((response) => response.text())
+      .then((result) => {
+        setProofOutput(result);
+        console.log(result);
+      })
+      .catch((error) => {
+        setProofOutput("Error fetching proof | " + error);
+        console.error(error);
+      });
+    console.log("Successfully generated proof");
+  }
+
   function handleSave() {
     showSnackbar("Saving...");
 
@@ -391,7 +413,12 @@ function App() {
               </Grid>
             </Grid>
             <Grid item xs="auto">
-              <Grid container direction={"row"} spacing={3} justifyContent="center">
+              <Grid
+                container
+                direction={"row"}
+                spacing={3}
+                justifyContent="center"
+              >
                 <Grid item xs={6}>
                   <ExampleSelector />
                 </Grid>
@@ -428,7 +455,7 @@ function App() {
                 <Grid item xs="auto">
                   <Button
                     sx={{ backgroundColor: "#292c34", color: "#ffffff" }}
-                    onClick={handleSave}
+                    onClick={handleProve}
                     disableRipple
                   >
                     Prove
@@ -462,7 +489,7 @@ function App() {
           </Typography>
           <TextareaAutosize
             minRows={10}
-            maxRows={25}
+            maxRows={20}
             value={compilationResult}
             readOnly
             placeholder="Compilation result will appear here..."
@@ -470,6 +497,7 @@ function App() {
               width: "100%",
               backgroundColor: "#292c34",
               color: "#d4d4d4",
+              height: "6vh",
               border: "1px solid #444",
               borderRadius: "4px",
               padding: "10px",
@@ -513,9 +541,9 @@ function App() {
               <TextareaAutosize
                 minRows={10}
                 maxRows={20}
-                value={assemblyCode}
+                value={proofOutput}
                 readOnly
-                placeholder="Assembly code will appear here..."
+                placeholder="Proof output details will appear here..."
                 style={{
                   width: "100%",
                   backgroundColor: "#292c34",
