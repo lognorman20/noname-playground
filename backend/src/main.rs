@@ -1,5 +1,9 @@
+use axum::body::Body;
 use axum::{
+    extract::Path,
+    extract::Query,
     http::StatusCode,
+    response::IntoResponse,
     routing::{get, post},
     Json, Router,
 };
@@ -7,6 +11,8 @@ use serde::Deserialize;
 use std::fs::File as StdFile;
 use std::io::Write;
 use std::process::Command;
+use tokio::fs::File;
+use tokio_util::io::ReaderStream;
 use tower_http::cors::CorsLayer;
 
 #[tokio::main]
@@ -17,6 +23,7 @@ async fn main() {
         .route("/", get(root))
         .route("/check_files", get(check_files))
         .route("/check_bin", get(check_bin))
+        .route("/get_file", get(get_file))
         .route("/prove", get(prove))
         .route("/run", post(run))
         .route("/get_asm", post(get_asm))
@@ -77,7 +84,6 @@ async fn check_bin() -> (StatusCode, Json<serde_json::Value>) {
     }
 }
 
-// TODO: add option to print the asm
 async fn run(Json(payload): Json<ProgramInfo>) -> (StatusCode, Json<serde_json::Value>) {
     // create the source code file
     println!("CREATING SOURCE CODE FILE");
@@ -216,6 +222,7 @@ async fn prove() -> (StatusCode, Json<serde_json::Value>) {
         .expect("Failed to execute command");
 
     println!("GENERATED JSON FILES...");
+    println!("PROVING...");
     let run_status = run_output.status.success();
     let run_response = if run_status {
         let proof_output = Command::new("./snarkjs-prove-and-verify.sh")
@@ -224,13 +231,25 @@ async fn prove() -> (StatusCode, Json<serde_json::Value>) {
             .expect("Failed to execute command");
 
         let proof_status = proof_output.status.success();
-        let proof_response = String::from_utf8_lossy(if proof_status { &proof_output.stdout } else { &proof_output.stderr }).to_string();
+        let proof_response = String::from_utf8_lossy(if proof_status {
+            &proof_output.stdout
+        } else {
+            &proof_output.stderr
+        })
+        .to_string();
         (proof_status, proof_response)
     } else {
-        (false, String::from_utf8_lossy(&run_output.stderr).to_string())
+        (
+            false,
+            String::from_utf8_lossy(&run_output.stderr).to_string(),
+        )
     };
 
-    let status = if run_status && run_response.0 { StatusCode::OK } else { StatusCode::ACCEPTED };
+    let status = if run_status && run_response.0 {
+        StatusCode::OK
+    } else {
+        StatusCode::ACCEPTED
+    };
     let response = serde_json::json!({
         "status": if run_status && run_response.0 { "success" } else { "error" },
         "response": run_response.1
@@ -239,10 +258,24 @@ async fn prove() -> (StatusCode, Json<serde_json::Value>) {
     (status, Json(response))
 }
 
+async fn get_file(Query(QueryParams { path }): Query<QueryParams>) -> impl IntoResponse {
+    let file = match File::open(path).await {
+        Ok(file) => file,
+        Err(_) => return (StatusCode::NOT_FOUND, "File not found buddy").into_response(),
+    };
+    let stream = ReaderStream::new(file);
+    Body::from_stream(stream).into_response()
+}
+
 #[derive(Deserialize)]
 struct ProgramInfo {
     code: String,
     public_input: String,
     private_input: String,
     backend: String,
+}
+
+#[derive(Deserialize)]
+pub struct QueryParams {
+    path: String,
 }
