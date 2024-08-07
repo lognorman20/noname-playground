@@ -23,6 +23,8 @@ import {
   basicSetupOptions,
   EXAMPLES,
 } from "./static";
+import axios from "axios";
+import { saveAs } from "file-saver";
 
 function App() {
   const [codeValue, setCodeValue] = React.useState(codePlaceholder);
@@ -294,17 +296,18 @@ function App() {
         const ansiEscapeRegex = /\x1B\[([0-9;]*[a-zA-Z])/g;
 
         // Remove ANSI escape sequences from the logs
-        let cleanedLogs = result.response.replace(ansiEscapeRegex, '');
+        let cleanedLogs = result.response.replace(ansiEscapeRegex, "");
 
         // Regular expression to find the log entries and reformat them
         const logEntryRegex = /\[INFO\]  snarkJS: (.*?)(?=\[INFO\]|$)/gs;
 
         // Extract and join the matched groups
         const matches = cleanedLogs.matchAll(logEntryRegex);
-        const output = Array.from(matches, match => `[INFO]  snarkJS: ${match[1]}`).join('\n');
-        setProofOutput(
-          result.response ? output : "No response key found",
-        );
+        const output = Array.from(
+          matches,
+          (match) => `[INFO]  snarkJS: ${match[1]}`,
+        ).join("\n");
+        setProofOutput(result.response ? output : "No response key found");
         showSnackbar("Proof generated successfully!", "success");
         console.log(result);
       })
@@ -330,18 +333,36 @@ function App() {
     showSnackbar("Code saved successfully!", "success");
   }
 
-  function handleSaveProof() {
-    showSnackbar("Saving proof (unimplemented)...");
+  async function downloadFile(path) {
+    try {
+      let url = `https://noname-playground.onrender.com/get_file?path=proof/${path}`;
+      const response = await axios.get(url, {
+        responseType: "blob",
+      });
+      const blob = new Blob([response.data]);
+      saveAs(blob, path);
+    } catch (error) {
+      console.error("Error downloading the file: ", error);
+    }
+  }
 
-    const blob = new Blob([codeValue], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
+  async function handleSaveProof() {
+    showSnackbar("Saving proof...");
 
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "main.no";
-    link.click();
+    const files = [
+      "proof.json",
+      "public.json",
+      "test_bn128_0001.zkey",
+      "test_bn128_0000.zkey",
+      "verification_key.json",
+      "verifier.sol",
+    ];
 
-    showSnackbar("Proof saved successfully! (sike lol)", "success");
+    for (const file of files) {
+      await downloadFile(file);
+    }
+
+    showSnackbar("Proof saved successfully!", "success");
   }
 
   return (
