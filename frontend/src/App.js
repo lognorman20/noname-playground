@@ -282,7 +282,7 @@ function App() {
   }
 
   function handleProve() {
-    showSnackbar("Proving...", "info");
+    showSnackbar("Proving, this may take a while...", "info");
 
     const requestOptions = {
       method: "GET",
@@ -369,7 +369,7 @@ function App() {
     <div className="app-container">
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={3000}
+        autoHideDuration={5000}
         onClose={handleCloseSnackbar}
       >
         <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity}>
