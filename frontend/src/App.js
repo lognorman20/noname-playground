@@ -37,6 +37,8 @@ function App() {
   );
   const [selectedBackend, setSelectedBackend] = React.useState("kimchi-vesta");
   const [selectedExample, setSelectedExample] = React.useState("");
+  const [isProveDisabled, setIsProveDisabled] = React.useState(true);
+  const [isSaveProofDisabled, setIsSaveProofDisabled] = React.useState(true);
 
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState("");
@@ -215,6 +217,7 @@ function App() {
           result.response ? result.response : "No response key found",
         );
         showSnackbar("Run completed successfully!", "success");
+        setIsProveDisabled(false);
       })
       .catch((error) => {
         setCompilationResult("Error fetching data | " + error);
@@ -271,6 +274,7 @@ function App() {
           result.response ? result.response : "No response key found",
         );
         showSnackbar("Assembly code generated successfully!", "success");
+        setIsProveDisabled(false);
       })
       .catch((error) => {
         setAssemblyCode("Error fetching data | " + error);
@@ -309,6 +313,7 @@ function App() {
         ).join("\n");
         setProofOutput(result.response ? output : "No response key found");
         showSnackbar("Proof generated successfully!", "success");
+        setIsSaveProofDisabled(false);
         console.log(result);
       })
       .catch((error) => {
@@ -508,6 +513,7 @@ function App() {
                     sx={{ backgroundColor: "#292c34", color: "#ffffff" }}
                     onClick={handleProve}
                     disableRipple
+                    disabled={isProveDisabled}
                   >
                     Prove
                   </Button>
@@ -526,6 +532,7 @@ function App() {
                     sx={{ backgroundColor: "#292c34", color: "#ffffff" }}
                     onClick={handleSaveProof}
                     disableRipple
+                    disabled={isSaveProofDisabled}
                   >
                     Save Proof
                   </Button>
