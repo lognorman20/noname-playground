@@ -1,8 +1,12 @@
 # Noname Playground
 
-A playground for writing circuits in the [Noname](https://github.com/zksecurity/noname) programming language.
+A playground for writing circuits in the [Noname](https://github.com/zksecurity/noname) programming language. 
+
+The playground is live at [noname-playground.xyz](https://noname-playground.xyz).
 
 [![Demo](https://img.youtube.com/vi/S8-2CsGzNhY/0.jpg)](https://www.youtube.com/watch?v=S8-2CsGzNhY)
+
+Demo video available here: https://www.youtube.com/watch?v=S8-2CsGzNhY
 
 ### Key Features
 
